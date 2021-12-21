@@ -3,4 +3,6 @@ export const typeMapWidget = {
   checkbox: 'checkboxes',
   inputnumber: 'number',
   textarea: 'textarea',
+  timepicker: 'time',
+  rangepicker: 'timeRange',
 };

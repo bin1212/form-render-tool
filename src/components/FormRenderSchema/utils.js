@@ -18,6 +18,16 @@ const objMapping = {
     type: 'string',
     widget: typeMapWidget.textarea,
   },
+  timepicker: {
+    type: 'string',
+    widget: typeMapWidget.timepicker,
+    format: 'time',
+  },
+  rangepicker: {
+    type: 'range',
+    widget: typeMapWidget.rangepicker,
+    format: 'time',
+  },
 };
 
 // 将选项值转换为form-render规定的数据结构
@@ -38,6 +48,14 @@ const formatDataSource = (dataSource, type) => {
       });
       break;
     default:
+      data = {
+        enum: [],
+        enumNames: [],
+      };
+      dataSource.map((item) => {
+        data.enum.push(item.value);
+        data.enumNames.push(item.label);
+      });
       break;
   }
   return data;

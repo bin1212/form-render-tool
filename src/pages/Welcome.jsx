@@ -62,6 +62,31 @@ const Welcome = () => {
       },
       hidden: '{{formData.name2=="a"}}',
     },
+    {
+      dataIndex: 'select1',
+      type: 'select',
+      title: '选择框',
+      dataSource: [
+        {
+          label: '选项1',
+          value: 'a',
+        },
+        {
+          label: '选项2',
+          value: 'b',
+        },
+      ],
+      props: {
+        allowClear: true,
+        mode: 'multiple',
+        showSearch: true,
+      },
+    },
+    {
+      dataIndex: 'times',
+      title: '时间选择框',
+      type: 'RangePicker',
+    },
   ];
 
   return (

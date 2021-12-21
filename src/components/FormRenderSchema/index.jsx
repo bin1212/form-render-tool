@@ -9,7 +9,6 @@ const { TextArea, Search } = Input;
 const Welcome = ({ formSchema = [], onOk, onCancel, CustomForm }) => {
   const form = useForm();
   const [schema, setSchema] = useState({});
-  // const [customWiget, setCustomWiget] = useState({});
 
   const onFinish = (data, errors) => {
     if (errors.length > 0) {
@@ -75,7 +74,6 @@ const Welcome = ({ formSchema = [], onOk, onCancel, CustomForm }) => {
       };
       schemaMap[dataIndex] = schemaItem;
     });
-    console.log(schemaMap, 'schemaMap');
     setSchema({
       displayType: 'row',
       type: 'object',

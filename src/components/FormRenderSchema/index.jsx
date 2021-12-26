@@ -1,12 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Input, message, Space, Checkbox, Switch } from 'antd';
+import { Button, Input, message, Space, Checkbox, Switch, Cascader } from 'antd';
 import FormRender, { useForm } from 'form-render';
 import { typeMapWidget } from './contants';
 import { formatDataSource, antdMappingRender } from './utils';
 
 const { TextArea, Search } = Input;
 
-const Welcome = ({ formSchema = [], onOk, onCancel, CustomForm }) => {
+/**
+ formSchema：表单结构
+[
+  {
+    dataIndex: 'select2', 表单的字段name
+    title: '输入框', label名
+    component:'Input', antd的组建名，如果自定义组件则不需要传
+    dependencies: ['useSelect'], 自定义组建依赖的dataIndex
+    widget: 'MyTextEditor', 自定义组件，此处的名称需要和传入的自定义组建的名称相同，自定义组件需要有value和onChange
+    dataSource:[{label: '选项1',value: 'a'}], 表单的需要的数据，比如select的下拉选项
+    rules:[],表单的rule，
+    props:{addonBefore: 'https://',},表单的props，和antd中组件的props一致，
+    hidden: '{{formData.name2=="a"}}', 表单联动，formData拿到当前表单的所有值
+    bind: ['startDate', 'endDate'],转换的字段名，比如时间区间选完后转换
+    disabled: '{{formData.useSelect==2}}',不可编辑
+  }
+]
+onOk :()=>{}确定，
+onCancel：()=>{}取消
+CustomForm：[{MyTextEditor:MyTextEditor}],自定义组件
+
+  例子：antd的TextArea有value和onchange的受控组件，如果是自己封装的则需要有value和onChange
+    addons.dependValues是依赖的值，
+  const MyTextEditor = (props) => {
+    const { addons } = props;
+    let rows;
+    if (addons && addons.dependValues) {
+      rows = addons.dependValues[0] || 2;
+    }
+    return <TextArea rows={rows} {...props} />;
+};
+ */
+
+const Index = ({ formSchema = [], onOk, onCancel, CustomForm, watch = {}, getForm }) => {
   const form = useForm();
   const [schema, setSchema] = useState({});
 
@@ -17,44 +50,22 @@ const Welcome = ({ formSchema = [], onOk, onCancel, CustomForm }) => {
       onOk(data);
     }
   };
-  const schemaMock = {
-    displayType: 'row',
-    type: 'object',
-    properties: {
-      useSelect: {
-        title: '输入框高度',
-        type: 'number',
-      },
-      select2: {
-        title: '输入框',
-        type: 'string',
-        dependencies: ['useSelect'],
-        widget: 'MyTextEditor',
-      },
-      name: {
-        title: '姓名:',
-        type: 'string',
-        dependencies: ['select2', 'useSelect'],
-        widget: 'CustomFormItem',
-        required: true,
-      },
-      name2: {
-        title: '姓名2:',
-        type: 'array',
-        enumNames: ['选项1', '选项2'],
-        enum: ['a', 'b'],
-        widget: 'checkboxes',
-        items: {
-          type: 'string',
-        },
-      },
-    },
-  };
   useEffect(() => {
+    getForm && getForm(form);
     let schemaMap = {};
-    formSchema.map((item) => {
-      const { dataIndex, dataSource, rules = [], type, show, ...others } = item;
-      const widgetType = type?.toLocaleLowerCase();
+    formSchema.map((item, index) => {
+      const {
+        dataIndex,
+        widget,
+        dataSource,
+        type,
+        rules = [],
+        component,
+        show,
+        props,
+        ...others
+      } = item;
+      const widgetComponent = component?.toLocaleLowerCase();
       // form-render的required写在外面
       let required = false;
       rules.map((item) => {
@@ -64,15 +75,32 @@ const Welcome = ({ formSchema = [], onOk, onCancel, CustomForm }) => {
           }
         }
       });
-      const widgetMapItem = antdMappingRender(widgetType) || { type: 'string', widget: type };
+      let widgetMapItem = {};
+      widgetMapItem = antdMappingRender(widgetComponent, props) || {
+        type: 'string',
+        widget: component,
+      };
+      if (widget) {
+        widgetMapItem = {
+          widget,
+          type: type || 'string',
+        };
+      } else {
+        widgetMapItem = antdMappingRender(widgetComponent, props) || {
+          type: 'string',
+          widget: component,
+        };
+      }
       let schemaItem = {
         required,
         ...rules,
+        props,
         ...widgetMapItem,
-        ...formatDataSource(dataSource, typeMapWidget[widgetType]),
+        ...formatDataSource(dataSource, typeMapWidget[widgetComponent]),
         ...others,
       };
-      schemaMap[dataIndex] = schemaItem;
+      const key = dataIndex || `key${index}`;
+      schemaMap[key] = schemaItem;
     });
     setSchema({
       displayType: 'row',
@@ -80,14 +108,16 @@ const Welcome = ({ formSchema = [], onOk, onCancel, CustomForm }) => {
       properties: schemaMap,
     });
   }, []);
+
   return (
     <>
       <FormRender
         form={form}
         schema={schema}
-        widgets={{ ...CustomForm, Switch, Checkbox, Search }}
+        widgets={{ ...CustomForm, Switch, Checkbox, Search, Cascader }}
         onFinish={onFinish}
         layout={'horizontal'}
+        watch={watch}
       />
 
       <Space>
@@ -100,12 +130,4 @@ const Welcome = ({ formSchema = [], onOk, onCancel, CustomForm }) => {
   );
 };
 
-const MyTextEditor = (props) => {
-  const { addons } = props;
-  let rows;
-  if (addons && addons.dependValues) {
-    rows = addons.dependValues[0] || 2;
-  }
-  return <TextArea rows={rows} {...props} />;
-};
-export default Welcome;
+export default Index;

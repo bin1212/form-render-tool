@@ -3,30 +3,99 @@ const { typeMapWidget } = require('./contants');
 
 // antd表单的默认结构映射
 const objMapping = {
-  checkbox: {
-    type: 'array',
-    items: {
+  checkbox: () => {
+    return {
+      type: 'array',
+      items: {
+        type: 'string',
+      },
+      widget: typeMapWidget.checkbox,
+    };
+  },
+  inputnumber: () => {
+    return {
+      type: 'number',
+      widget: typeMapWidget.inputnumber,
+    };
+  },
+  textarea: () => {
+    return {
       type: 'string',
-    },
-    widget: typeMapWidget.checkbox,
+      widget: typeMapWidget.textarea,
+    };
   },
-  inputnumber: {
-    type: 'number',
-    widget: typeMapWidget.inputnumber,
+  timepicker: () => {
+    return {
+      type: 'string',
+      widget: typeMapWidget.timepicker,
+      format: 'time',
+    };
   },
-  textarea: {
-    type: 'string',
-    widget: typeMapWidget.textarea,
+  timerangepicker: () => {
+    return {
+      type: 'range',
+      widget: typeMapWidget.timerangepicker,
+      format: 'dateTime',
+    };
   },
-  timepicker: {
-    type: 'string',
-    widget: typeMapWidget.timepicker,
-    format: 'time',
+  datepicker: (props) => {
+    const { picker } = props;
+    return {
+      type: 'string',
+      widget: typeMapWidget.datepicker,
+      format: picker || 'time',
+    };
   },
-  rangepicker: {
-    type: 'range',
-    widget: typeMapWidget.rangepicker,
-    format: 'time',
+  daterangepicker: (props) => {
+    const { picker } = props;
+    return {
+      type: 'range',
+      widget: typeMapWidget.daterangepicker,
+      format: picker || 'time',
+    };
+  },
+  cascader: () => {
+    return {
+      type: 'array',
+      widget: typeMapWidget.cascader,
+    };
+  },
+  rate: () => {
+    return {
+      type: 'number',
+      widget: typeMapWidget.rate,
+    };
+  },
+  slider: () => {
+    return {
+      type: 'number',
+      widget: typeMapWidget.slider,
+    };
+  },
+  switch: () => {
+    return {
+      type: 'boolean',
+      widget: typeMapWidget.switch,
+    };
+  },
+  html: () => {
+    return {
+      type: 'html',
+      widget: 'html',
+    };
+  },
+  upload: () => {
+    return {
+      type: 'string',
+      widget: typeMapWidget.upload,
+    };
+  },
+  select: (props) => {
+    const { mode } = props;
+    return {
+      type: mode === 'multiple' ? 'array' : 'string',
+      widget: typeMapWidget.select,
+    };
   },
 };
 
@@ -61,11 +130,11 @@ const formatDataSource = (dataSource, type) => {
   return data;
 };
 
-const antdMappingRender = (type) => {
+const antdMappingRender = (type, props) => {
   if (!typeMapWidget[type]) {
     return null;
   }
-  return objMapping[type];
+  return objMapping[type] && objMapping[type](props);
 };
 module.exports = {
   formatDataSource,

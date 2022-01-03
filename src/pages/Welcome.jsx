@@ -99,12 +99,15 @@ const Welcome = () => {
           console.log(val);
         },
       },
+      default: 'abcd',
       hidden: '{{formData.name2=="a"}}',
     },
     {
       dataIndex: 'select1',
       component: 'select',
       title: '选择框',
+      enum: ['east', 'south', 'west', 'north'],
+      enumNames: ['东', '南', '西', '北'],
       // dataSource: [
       //   {
       //     label: '选项1',
@@ -162,12 +165,13 @@ const Welcome = () => {
           getForm={(v) => {
             setForm(v);
           }}
+          onMount={() => {}}
           watch={{
             '#': (val) => {
               console.log('表单的时时数据为：', val);
             },
             useSelect: (val) => {
-              form.onItemChange('select2', val);
+              form?.onItemChange('select2', val);
             },
           }}
         />

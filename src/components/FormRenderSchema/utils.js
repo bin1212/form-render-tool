@@ -88,13 +88,18 @@ const objMapping = {
     return {
       type: 'string',
       widget: typeMapWidget.upload,
+      format: 'upload',
     };
   },
   select: (props) => {
     const { mode } = props;
     return {
       type: mode === 'multiple' ? 'array' : 'string',
-      widget: typeMapWidget.select,
+      // widget: typeMapWidget.select,
+      widget: mode === 'multiple' ? 'multiSelect' : 'select',
+      items: {
+        type: 'string',
+      },
     };
   },
 };
@@ -102,6 +107,7 @@ const objMapping = {
 // 将选项值转换为form-render规定的数据结构
 const formatDataSource = (dataSource, type) => {
   if (_.isEmpty(dataSource)) {
+    console.log(type, 'no data');
     return {};
   }
   let data = {};
@@ -127,6 +133,7 @@ const formatDataSource = (dataSource, type) => {
       });
       break;
   }
+  console.log(data);
   return data;
 };
 

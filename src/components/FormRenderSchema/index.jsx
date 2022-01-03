@@ -39,7 +39,7 @@ CustomForm：[{MyTextEditor:MyTextEditor}],自定义组件
 };
  */
 
-const Index = ({ formSchema = [], onOk, onCancel, CustomForm, watch = {}, getForm }) => {
+const Index = ({ formSchema = [], onOk, onCancel, CustomForm, watch = {}, getForm, onMount }) => {
   const form = useForm();
   const [schema, setSchema] = useState({});
 
@@ -87,7 +87,7 @@ const Index = ({ formSchema = [], onOk, onCancel, CustomForm, watch = {}, getFor
         };
       } else {
         widgetMapItem = antdMappingRender(widgetComponent, props) || {
-          type: 'string',
+          type: 'any',
           widget: component,
         };
       }
@@ -96,7 +96,7 @@ const Index = ({ formSchema = [], onOk, onCancel, CustomForm, watch = {}, getFor
         ...rules,
         props,
         ...widgetMapItem,
-        ...formatDataSource(dataSource, typeMapWidget[widgetComponent]),
+        // ...formatDataSource(dataSource, typeMapWidget[widgetComponent]),
         ...others,
       };
       const key = dataIndex || `key${index}`;
@@ -108,7 +108,13 @@ const Index = ({ formSchema = [], onOk, onCancel, CustomForm, watch = {}, getFor
       properties: schemaMap,
     });
   }, []);
-
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+  const onMountSelf = () => {
+    form.setSchemaByPath('select1', {
+      enum: ['east', 'south', 'west', 'north'],
+      enumNames: ['东', '南', '西', '北'],
+    });
+  };
   return (
     <>
       <FormRender
@@ -118,6 +124,15 @@ const Index = ({ formSchema = [], onOk, onCancel, CustomForm, watch = {}, getFor
         onFinish={onFinish}
         layout={'horizontal'}
         watch={watch}
+        // onMount={onMount}
+        // onMount={() => {
+        //   delay(3000).then((_) => {
+        //     form.setSchemaByPath('select1', {
+        //       enum: ['a', 'b', 'c'],
+        //       enumNames: ['早', '中', '晚'],
+        //     });
+        //   });
+        // }}
       />
 
       <Space>
